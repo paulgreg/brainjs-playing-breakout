@@ -91,6 +91,6 @@ function train () {
         const last = estimations[estimations.length - 1]
         estimationEl.innerText = `${estimations.length} estimations fed to neural network`
         net.train(estimations, {timeout: 15})
-        neuralNetworkEl.innerText = 'Neural network: ' + JSON.stringify(net.toJSON(), null, 2)
+        neuralNetworkEl.value = 'Neural network: ' + JSON.stringify(net.toJSON(), null, 2)
     }
 }

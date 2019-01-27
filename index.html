@@ -4,13 +4,14 @@
     <meta charset="utf-8" />
     <title></title>
     <style>
-        body { overflow: hidden; }
+        body { overflow-x: hidden; }
         pre { display: block; margin: .25em 0; white-space: pre-wrap; }
         button { margin: 0 1em; }
         canvas { display: block; background: white; border: 1px solid black;  }
         .margin { margin-left: 1em; }
         .result { display: inline-block; font-weight: bold; width: 150px; }
         .status, .ia { display: block; }
+        .neuralNetwork { width: 100%; height: 500px; }
         .gameover { color: red; }
         .goodgame { color: green; }
     </style>
@@ -31,13 +32,13 @@
         For correct result with human training, you’ll have to follow the ball, not anticipate the move.
     <p>
     <section>
-        <pre class="status"></pre>
-        <pre class="input"></pre>
-        <pre class="output"></pre>
+        <pre class="status">Game status: </pre>
+        <pre class="input">input: </pre>
+        <pre class="output">output: </pre>
     </section>
     <canvas id="game" width="480" height="320"></canvas>
     <pre class="estimation"></pre>
-    <pre class="neuralNetwork"></pre>
+    <textarea class="neuralNetwork"></textarea>
     <script src="./lib/browser.js"></script>
     <script src="./game.js"></script>
     <script src="./ia.js"></script>
