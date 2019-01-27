@@ -37,7 +37,37 @@ function format (prediction) {
     }
 }
 
-function updateStatus () {
+function autolearn (input) {
+    resultEl.innerText = 'AUTO-LEARNING'
+    leftPressed = rightPressed = false
+    const estimation = estimate(status)
+    outputEl.innerText = 'output: ' + JSON.stringify(estimation)
+    estimations.push({input, output: estimation})
+    train()
+    if (estimation.left) leftPressed = true
+    else if (estimation.right) rightPressed = true
+}
+
+function learnFromHuman (input) {
+    resultEl.innerText = 'LEARNING FROM HUMAN'
+    const estimation = getHumanEstimate()
+    outputEl.innerText = 'output: ' + JSON.stringify(estimation)
+    estimations.push({input, output: estimation})
+    train()
+}
+
+function iaPlay (input) {
+    leftPressed = rightPressed = false
+    resultEl.innerText = 'IA PLAYING'
+    const prediction = net.run(input)
+    if (prediction) {
+        outputEl.innerText = 'output: ' + JSON.stringify(format(prediction))
+        if (prediction.left > prediction.right) leftPressed = true
+        else if (prediction.right > prediction.left) rightPressed = true
+    }
+}
+
+function update() {
     status = exportStatus()
     if (status.x) {
         const input = toInput(status)
@@ -46,37 +76,15 @@ function updateStatus () {
         const modeEl = document.querySelector("input[name='mode']:checked");
         const learn = modeEl.value === 'learn'
         if (learn) {
-            if (autolearnEl.checked) {
-                resultEl.innerText = 'AUTO-LEARNING'
-                leftPressed = rightPressed = false
-                const estimation = estimate(status)
-                outputEl.innerText = 'output: ' + JSON.stringify(estimation)
-                estimations.push({input, output: estimation})
-                train()
-                if (estimation.left) leftPressed = true
-                else if (estimation.right) rightPressed = true
-            } else {
-                resultEl.innerText = 'LEARNING FROM HUMAN'
-                const estimation = getHumanEstimate()
-                outputEl.innerText = 'output: ' + JSON.stringify(estimation)
-                estimations.push({input, output: estimation})
-                train()
-            }
+            if (autolearnEl.checked) autolearn(input)
+            else learnFromHuman(input)
         } else {
-            leftPressed = rightPressed = false
-            resultEl.innerText = 'IA PLAYING'
-            const prediction = net.run(input)
-            if (prediction) {
-                outputEl.innerText = 'output: ' + JSON.stringify(format(prediction))
-                if (prediction.left > prediction.right) leftPressed = true
-                else if (prediction.right > prediction.left) rightPressed = true
-            }
+            iaPlay(input)
         }
     }
-    requestAnimationFrame(updateStatus)
+    requestAnimationFrame(update)
 }
-updateStatus()
-
+update()
 
 function train () {
     if (estimations.length) {
