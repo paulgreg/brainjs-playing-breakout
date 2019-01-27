@@ -1,7 +1,6 @@
 // Game from https://developer.mozilla.org/fr/docs/Games/Workflows/2D_Breakout_game_pure_JavaScript
 const canvas = document.getElementById("game");
 const slider = document.querySelector('.slider')
-let speed
 const ctx = canvas.getContext("2d");
 const paddleHeight = 10;
 const ballRadius = 10;
@@ -14,7 +13,7 @@ const brickPadding = 10;
 const brickOffsetTop = 30;
 const brickOffsetLeft = 30;
 const result = document.querySelector('.result')
-let rightPressed, leftPressed, x, y, dx, dy, paddleX, score, lives, stop, bricks
+let speed, paddleY, rightPressed, leftPressed, x, y, dx, dy, paddleX, score, lives, stop, bricks
 
 function init() {
     speed = slider.value
@@ -24,7 +23,8 @@ function init() {
     y = canvas.height-30;
     dx = speed;
     dy = -speed;
-    paddleX = (canvas.width-paddleWidth)/2;
+    paddleX = (canvas.width-paddleWidth)/2
+    paddleY = canvas.height-paddleHeight
     lives = 1
     score = 0
     stop = false
@@ -35,8 +35,12 @@ function init() {
 
 function exportStatus () {
     return !stop ? {
+        rightPressed,
+        leftPressed,
         x,
-        paddleX
+        y,
+        paddleX,
+        paddleY,
     } : {}
 }
 
@@ -51,9 +55,11 @@ function initBricks() {
 }
 
 function start () {
-    init()
-    draw()
-
+    stop = true
+    requestAnimationFrame(() => {
+        init()
+        draw()
+    })
 }
 
 document.querySelector('.start').addEventListener("click", start, false);
@@ -63,8 +69,10 @@ document.addEventListener("keyup", keyUpHandler, false);
 function keyDownHandler(e) {
     if(e.keyCode == 39) {
         rightPressed = true;
+        leftPressed = false;
     }
     else if(e.keyCode == 37) {
+        rightPressed = false;
         leftPressed = true;
     }
 }
@@ -105,7 +113,7 @@ function drawBall() {
 }
 function drawPaddle() {
     ctx.beginPath();
-    ctx.rect(paddleX, canvas.height-paddleHeight, paddleWidth, paddleHeight);
+    ctx.rect(paddleX, paddleY, paddleWidth, paddleHeight);
     ctx.fillStyle = "#0095DD";
     ctx.fill();
     ctx.closePath();

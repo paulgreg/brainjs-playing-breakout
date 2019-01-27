@@ -1,13 +1,12 @@
-const statusEl = document.querySelector(".status");
-const resultEl = document.querySelector(".result");
-const estimationEl = document.querySelector(".estimation");
-const inputEl = document.querySelector(".input");
-const outputEl = document.querySelector(".output");
-const neuralNetworkEl = document.querySelector(".neuralNetwork");
-let status = {}, previousStatus = {}
-const config = {
-}
-const net = new brain.NeuralNetwork(config)
+const statusEl = document.querySelector(".status")
+const resultEl = document.querySelector(".result")
+const estimationEl = document.querySelector(".estimation")
+const inputEl = document.querySelector(".input")
+const outputEl = document.querySelector(".output")
+const neuralNetworkEl = document.querySelector(".neuralNetwork")
+const autolearnEl = document.querySelector("input[name='autolearn']")
+const net = new brain.NeuralNetwork({})
+let status = {}
 
 function estimate ({paddleX, x}) {
     const paddleCenterX= paddleX + paddleWidth / 2
@@ -16,49 +15,64 @@ function estimate ({paddleX, x}) {
     return { left, right }
 }
 
+function getHumanEstimate() {
+    return {
+        right: rightPressed ? 1 : 0,
+        left: leftPressed ? 1 : 0
+    }
+}
+
 let estimations = []
 
-function toInput (status, previousStatus) {
+function toInput (status) {
     const paddleCenterX= paddleX + paddleWidth / 2
-    return { move: status.x - paddleCenterX }
+    const diffX = status.x - paddleCenterX
+    return { diffX }
 }
 
 function format (prediction) {
     return {
-        right: prediction ? prediction.right.toFixed(4) : 0,
-        left: prediction ? prediction.left.toFixed(4) : 0
+        right: prediction.right.toFixed(2),
+        left: prediction.left.toFixed(2)
     }
 }
 
 function updateStatus () {
     status = exportStatus()
-    if (status.x && previousStatus.x) {
-        const input = toInput(status, previousStatus)
-        statusEl.innerText = `game status: ${JSON.stringify(status)}`
+    if (status.x) {
+        const input = toInput(status)
+        statusEl.innerText = `game status: ${JSON.stringify(status, null, 2)}`
         inputEl.innerText = `input: ${JSON.stringify(input)}`
         const modeEl = document.querySelector("input[name='mode']:checked");
         const learn = modeEl.value === 'learn'
-        leftPressed = rightPressed = false
         if (learn) {
-            resultEl.innerText = 'LEARNING'
-            const estimation = estimate(status)
-            outputEl.innerText = 'output (estimation): ' + JSON.stringify(estimation)
-
-            estimations.push({input, output: estimation})
-            train()
-
-            if (estimation.left) leftPressed = true
-            else if (estimation.right) rightPressed = true
+            if (autolearnEl.checked) {
+                resultEl.innerText = 'AUTO-LEARNING'
+                leftPressed = rightPressed = false
+                const estimation = estimate(status)
+                outputEl.innerText = 'output: ' + JSON.stringify(estimation)
+                estimations.push({input, output: estimation})
+                train()
+                if (estimation.left) leftPressed = true
+                else if (estimation.right) rightPressed = true
+            } else {
+                resultEl.innerText = 'LEARNING FROM HUMAN'
+                const estimation = getHumanEstimate()
+                outputEl.innerText = 'output: ' + JSON.stringify(estimation)
+                estimations.push({input, output: estimation})
+                train()
+            }
         } else {
+            leftPressed = rightPressed = false
             resultEl.innerText = 'IA PLAYING'
-            const prediction = format(net.run(input))
-            outputEl.innerText = 'output (neural network prediction): ' + JSON.stringify(prediction)
-
-            if (prediction.left > prediction.right) leftPressed = true
-            else if (prediction.right > prediction.left) rightPressed = true
+            const prediction = net.run(input)
+            if (prediction) {
+                outputEl.innerText = 'output: ' + JSON.stringify(format(prediction))
+                if (prediction.left > prediction.right) leftPressed = true
+                else if (prediction.right > prediction.left) rightPressed = true
+            }
         }
     }
-    previousStatus = status
     requestAnimationFrame(updateStatus)
 }
 updateStatus()
@@ -68,7 +82,7 @@ function train () {
     if (estimations.length) {
         const last = estimations[estimations.length - 1]
         estimationEl.innerText = `${estimations.length} estimations fed to neural network`
-        net.train(estimations)
-        neuralNetworkEl.innerText = 'Neural network: ' + JSON.stringify(net.toJSON())
+        net.train(estimations, {timeout: 15})
+        neuralNetworkEl.innerText = 'Neural network: ' + JSON.stringify(net.toJSON(), null, 2)
     }
 }

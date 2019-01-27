@@ -4,10 +4,12 @@
     <meta charset="utf-8" />
     <title></title>
     <style>
+        body { overflow: hidden; }
         pre { display: block; margin: .25em 0; white-space: pre-wrap; }
         button { margin: 0 1em; }
         canvas { display: block; background: white; border: 1px solid black;  }
-        .result { font-weight: bold; }
+        .margin { margin-left: 1em; }
+        .result { display: inline-block; font-weight: bold; width: 150px; }
         .status, .ia { display: block; }
         .gameover { color: red; }
         .goodgame { color: green; }
@@ -15,12 +17,19 @@
 </head>
 <body>
     <section>
-        <input type="radio" id="learn" name="mode" value="learn" checked><label for="learn">Learn</label>
-        <input type="radio" id="play" name="mode" value="play"><label for="play">Play</label>
-         <input type="range" min="1" max="15" value="5" class="slider">
         <button class="start">start</button>
         <span class="result">PAUSED</span>
+        <label class="margin">Learn<input type="radio" id="learn" name="mode" value="learn" checked></label>
+        <label>Play<input type="radio" id="play" name="mode" value="play"></label>
+        <label class="margin">auto-learn: <input type="checkbox" name="autolearn"></label>
+        <label class="margin">speed: <input type="range" min="1" max="15" value="3" class="slider"></label>
     </section>
+    <p>
+        You’ll have to learn the neural network first.
+        You can do it automatically (check auto-learn above) or you can play yourself.
+        If so, use arrow key to move the paddle.
+        For correct result with human training, you’ll have to follow the ball, not anticipate the move.
+    <p>
     <section>
         <pre class="status"></pre>
         <pre class="input"></pre>
