@@ -1,0 +1,14 @@
+{
+  "name": "arkanoid-with-brainjs",
+  "version": "1.0.0",
+  "description": "",
+  "main": "game.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "brain.js": "^1.6.1"
+  }
+}

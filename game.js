@@ -1,4 +1,7 @@
-const canvas = document.getElementById("myCanvas");
+// Game from https://developer.mozilla.org/fr/docs/Games/Workflows/2D_Breakout_game_pure_JavaScript
+const canvas = document.getElementById("game");
+const slider = document.querySelector('.slider')
+let speed
 const ctx = canvas.getContext("2d");
 const paddleHeight = 10;
 const ballRadius = 10;
@@ -14,17 +17,27 @@ const result = document.querySelector('.result')
 let rightPressed, leftPressed, x, y, dx, dy, paddleX, score, lives, stop, bricks
 
 function init() {
+    speed = slider.value
     rightPressed = false;
     leftPressed = false;
     x = canvas.width/2;
     y = canvas.height-30;
-    dx = 2;
-    dy = -2;
+    dx = speed;
+    dy = -speed;
     paddleX = (canvas.width-paddleWidth)/2;
     lives = 1
     score = 0
     stop = false
     initBricks()
+    result.classList.remove('goodgame')
+    result.classList.remove('gameover')
+}
+
+function exportStatus () {
+    return !stop ? {
+        x,
+        paddleX
+    } : {}
 }
 
 function initBricks() {
@@ -38,7 +51,6 @@ function initBricks() {
 }
 
 function start () {
-    result.innerText = ''
     init()
     draw()
 
@@ -75,6 +87,7 @@ function collisionDetection() {
                     score++;
                     if(score == brickRowCount*brickColumnCount) {
                         result.innerText = "YOU WIN";
+                        result.classList.add('goodgame')
                         stop = true
                     }
                 }
@@ -126,6 +139,7 @@ function drawLives() {
 }
 
 function draw() {
+    speed = slider.value
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     drawBricks();
     drawBall();
@@ -148,23 +162,24 @@ function draw() {
             lives--;
             if(!lives) {
                 result.innerText = "GAME OVER";
+                result.classList.add('gameover')
                 stop = true
             }
             else {
                 x = canvas.width/2;
                 y = canvas.height-30;
-                dx = 3;
-                dy = -3;
+                dx = speed;
+                dy = -speed;
                 paddleX = (canvas.width-paddleWidth)/2;
             }
         }
     }
 
     if(rightPressed && paddleX < canvas.width-paddleWidth) {
-        paddleX += 7;
+        paddleX += speed * 1.5;
     }
     else if(leftPressed && paddleX > 0) {
-        paddleX -= 7;
+        paddleX -= speed * 1.5;
     }
 
     x += dx;
