@@ -24,9 +24,9 @@ function getHumanEstimate() {
 
 let estimations = []
 
-function toInput (status) {
+function toInput ({x, y}) {
     const paddleCenterX= paddleX + paddleWidth / 2
-    const diffX = status.x - paddleCenterX
+    const diffX = x - paddleCenterX
     return { diffX }
 }
 
